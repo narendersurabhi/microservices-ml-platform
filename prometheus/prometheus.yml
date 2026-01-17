@@ -1,0 +1,22 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: gateway
+    static_configs:
+      - targets: ["gateway:8000"]
+  - job_name: auth-service
+    static_configs:
+      - targets: ["auth-service:8000"]
+  - job_name: user-service
+    static_configs:
+      - targets: ["user-service:8000"]
+  - job_name: case-service
+    static_configs:
+      - targets: ["case-service:8000"]
+  - job_name: scoring-service
+    static_configs:
+      - targets: ["scoring-service:8000"]
+  - job_name: audit-telemetry-service
+    static_configs:
+      - targets: ["audit-telemetry-service:8000"]

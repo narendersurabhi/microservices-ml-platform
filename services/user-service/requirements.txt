@@ -1,0 +1,12 @@
+fastapi==0.111.0
+uvicorn[standard]==0.30.0
+sqlmodel==0.0.16
+psycopg2-binary==2.9.9
+prometheus-fastapi-instrumentator==7.0.0
+opentelemetry-api==1.25.0
+opentelemetry-sdk==1.25.0
+opentelemetry-exporter-jaeger==1.25.0
+opentelemetry-instrumentation-fastapi==0.46b0
+opentelemetry-instrumentation-httpx==0.46b0
+python-jose==3.3.0
+alembic==1.13.1

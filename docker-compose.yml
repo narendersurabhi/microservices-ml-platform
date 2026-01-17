@@ -1,0 +1,138 @@
+version: "3.9"
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    ports:
+      - "8080:8000"
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:8000
+      USER_SERVICE_URL: http://user-service:8000
+      CASE_SERVICE_URL: http://case-service:8000
+      SCORING_SERVICE_URL: http://scoring-service:8000
+      AUDIT_SERVICE_URL: http://audit-telemetry-service:8000
+      JWT_SECRET: dev-secret
+      JAEGER_HOST: jaeger
+    depends_on:
+      - auth-service
+      - user-service
+      - case-service
+      - scoring-service
+      - audit-telemetry-service
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    environment:
+      JWT_SECRET: dev-secret
+      JAEGER_HOST: jaeger
+
+  user-service:
+    build:
+      context: .
+      dockerfile: services/user-service/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg2://user:password@user-db:5432/userdb
+      JWT_SECRET: dev-secret
+      JAEGER_HOST: jaeger
+    depends_on:
+      - user-db
+
+  case-service:
+    build:
+      context: .
+      dockerfile: services/case-service/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg2://case:password@case-db:5432/casedb
+      SCORING_SERVICE_URL: http://scoring-service:8000
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: dev-secret
+      INTERNAL_TOKEN: internal-dev-token
+      JAEGER_HOST: jaeger
+    depends_on:
+      - case-db
+      - redis
+
+  scoring-service:
+    build:
+      context: .
+      dockerfile: services/scoring-service/Dockerfile
+    environment:
+      CASE_SERVICE_URL: http://case-service:8000
+      USER_SERVICE_URL: http://user-service:8000
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: dev-secret
+      INTERNAL_TOKEN: internal-dev-token
+      JAEGER_HOST: jaeger
+    depends_on:
+      - redis
+
+  audit-telemetry-service:
+    build:
+      context: .
+      dockerfile: services/audit-telemetry-service/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg2://audit:password@audit-db:5432/auditdb
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: dev-secret
+      JAEGER_HOST: jaeger
+    depends_on:
+      - audit-db
+      - redis
+
+  user-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: userdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+
+  case-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: casedb
+      POSTGRES_USER: case
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5434:5432"
+
+  audit-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: auditdb
+      POSTGRES_USER: audit
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5435:5432"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.57
+    ports:
+      - "16686:16686"
+      - "6831:6831/udp"
+
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:11.0.0
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/service-overview.json

@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:24.0-dind
+        options: --privileged
+        ports:
+          - 2375:2375
+    env:
+      DOCKER_HOST: tcp://localhost:2375
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install -r services/auth-service/requirements.txt
+          pip install -r services/gateway/requirements.txt
+          pip install -r services/user-service/requirements.txt
+          pip install -r services/case-service/requirements.txt
+          pip install -r services/scoring-service/requirements.txt
+          pip install -r services/audit-telemetry-service/requirements.txt
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Typecheck
+        run: mypy .
+
+      - name: Unit tests
+        run: pytest -m "not integration" --cov=. --cov-report=xml
+
+      - name: Integration tests
+        run: |
+          docker compose up -d --build
+          pytest -m integration
+          docker compose down -v
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.xml
+
+      - name: Build images
+        run: docker compose build

@@ -1,0 +1,24 @@
+{
+  "title": "Service Overview",
+  "uid": "service-overview",
+  "schemaVersion": 38,
+  "version": 1,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Request Rate",
+      "targets": [
+        {"expr": "sum(rate(http_requests_total[1m]))", "legendFormat": "requests"}
+      ],
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0}
+    },
+    {
+      "type": "timeseries",
+      "title": "Error Rate",
+      "targets": [
+        {"expr": "sum(rate(http_requests_total{status_code=~'5..'}[1m]))", "legendFormat": "errors"}
+      ],
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+    }
+  ]
+}
