@@ -3,11 +3,10 @@ from datetime import datetime
 
 import pytest
 
-jsonschema = pytest.importorskip("jsonschema")
-validate = jsonschema.validate
-
 from libs.platform_lib.schemas import load_schema
 
+jsonschema = pytest.importorskip("jsonschema")
+validate = jsonschema.validate
 
 def test_user_schema() -> None:
     schema = load_schema("user")
