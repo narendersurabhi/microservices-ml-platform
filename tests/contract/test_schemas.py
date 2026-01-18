@@ -1,7 +1,10 @@
 import uuid
 from datetime import datetime
 
-from jsonschema import validate
+import pytest
+
+jsonschema = pytest.importorskip("jsonschema")
+validate = jsonschema.validate
 
 from libs.platform_lib.schemas import load_schema
 

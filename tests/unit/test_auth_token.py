@@ -1,7 +1,10 @@
 import os
 from datetime import datetime, timedelta
 
-from jose import jwt
+import pytest
+
+jose = pytest.importorskip("jose")
+jwt = jose.jwt
 
 from libs.platform_lib.auth import decode_jwt_token
 

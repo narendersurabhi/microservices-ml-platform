@@ -1,7 +1,8 @@
 import time
 
-import httpx
 import pytest
+
+httpx = pytest.importorskip("httpx")
 
 
 @pytest.mark.integration
