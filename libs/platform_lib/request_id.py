@@ -15,5 +15,5 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
         return response
 
 
-def request_id_middleware() -> RequestIdMiddleware:
-    return RequestIdMiddleware()
+def request_id_middleware() -> type[BaseHTTPMiddleware]:
+    return RequestIdMiddleware

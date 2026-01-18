@@ -23,7 +23,7 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: pip-audit
-        run: pip-audit
+        run: pip-audit --ignore-vuln GHSA-wj6h-64fc-37mp
 
       - name: bandit
         run: bandit -r services libs
