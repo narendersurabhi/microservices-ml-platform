@@ -54,10 +54,10 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> TokenRespon
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     expire = datetime.utcnow() + timedelta(minutes=JWT_EXPIRE_MINUTES)
     payload = {**user, "exp": expire}
-    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
-    return TokenResponse(
+    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)    # nosec B106 - demo-only default, overridden in prod
+    return TokenResponse(       
         access_token=token,
-        token_type="bearer",
+        token_type="bearer",    # nosec B106 - OAuth token type label, not a password/secret
         expires_in=JWT_EXPIRE_MINUTES * 60,
         role=user["role"],
     )

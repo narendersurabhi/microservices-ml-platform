@@ -84,13 +84,13 @@ async def score_case(
     internal_token: Optional[str] = Header(default=None, alias="X-Internal-Token"),
 ) -> dict:
     internal_or_jwt(request=request, internal_token=internal_token)
-    await asyncio.sleep(random.uniform(0.3, 1.2))
-    if random.random() < 0.2:
+    await asyncio.sleep(random.uniform(0.3, 1.2))   # nosec B311 - demo-only default, overridden in prod
+    if random.random() < 0.2:   # nosec B311 - demo-only default, overridden in prod
         raise HTTPException(status_code=503, detail="Scoring engine unavailable")
     case = await fetch_case(case_id)
     owner_id = case.get("owner_id") if case else None
     owner = await fetch_user(uuid.UUID(owner_id)) if owner_id else None
-    score = round(random.uniform(0.1, 0.99), 4)
+    score = round(random.uniform(0.1, 0.99), 4)     # nosec B311 - non-security mock score
     payload = {
         "case_id": str(case_id),
         "score": score,
