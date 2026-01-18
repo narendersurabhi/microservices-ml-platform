@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: microservices-reference
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+        - name: gateway
+          image: gateway:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: JWT_SECRET
+              value: dev-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: microservices-reference
+spec:
+  selector:
+    app: gateway
+  ports:
+    - port: 80
+      targetPort: 8000

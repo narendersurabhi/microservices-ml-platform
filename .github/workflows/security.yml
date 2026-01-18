@@ -1,0 +1,45 @@
+name: Security
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  push:
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: pip-audit
+        run: pip-audit --ignore-vuln GHSA-wj6h-64fc-37mp
+
+      - name: bandit
+        run: bandit -r services libs
+
+      - name: Build images
+        run: docker compose build
+
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: gateway
+          scan-type: image
+          format: table
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0.16.0
+        with:
+          format: spdx-json
+          output-file: sbom.spdx.json

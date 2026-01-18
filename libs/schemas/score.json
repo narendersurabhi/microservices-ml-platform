@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Score",
+  "type": "object",
+  "properties": {
+    "case_id": {"type": "string", "format": "uuid"},
+    "score": {"type": "number"},
+    "updated_at": {"type": "string", "format": "date-time"}
+  },
+  "required": ["case_id", "score", "updated_at"]
+}

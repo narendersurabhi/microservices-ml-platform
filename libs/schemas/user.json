@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "User",
+  "type": "object",
+  "properties": {
+    "id": {"type": "string", "format": "uuid"},
+    "email": {"type": "string", "format": "email"},
+    "role": {"type": "string", "enum": ["admin", "analyst", "viewer"]},
+    "full_name": {"type": "string"},
+    "created_at": {"type": "string", "format": "date-time"}
+  },
+  "required": ["id", "email", "role", "full_name", "created_at"]
+}
